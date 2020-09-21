@@ -11,29 +11,28 @@ class Registry(metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def register_service(self,
-                         *,
-                         namespace: str = "default",
-                         name: str,
-                         version: str = "1",
-                         tags: Dict[str, str],
-                         locations: Iterable[str],
-                         ) -> ServiceDefinition:
+    def register_service(
+        self,
+        *,
+        namespace: str = "default",
+        name: str,
+        version: str = "1",
+        tags: Dict[str, str],
+        locations: Iterable[str],
+    ) -> ServiceDefinition:
         ...
 
     @abc.abstractmethod
-    def resolve_service(self,
-                        *,
-                        namespace: str = "default",
-                        name: str,
-                        version: str = "1",
-                        tags: Dict[str, str],
-                        ) -> Iterable[ServiceDefinition]:
+    def resolve_service(
+        self,
+        *,
+        namespace: str = "default",
+        name: str,
+        version: str = "1",
+        tags: Dict[str, str],
+    ) -> Iterable[ServiceDefinition]:
         ...
 
     @abc.abstractmethod
-    def unregister_service(self,
-                           *,
-                           instance_id: str) -> bool:
+    def unregister_service(self, *, instance_id: str) -> bool:
         ...
-
