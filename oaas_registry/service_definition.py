@@ -20,3 +20,6 @@ class ServiceDefinition:
     @property
     def instance_id(self) -> str:
         return self.tags["_instance_id"]
+
+    def __repr__(self) -> str:
+        return f"svc:{self.namespace}:{self.name}:{self.version}"
