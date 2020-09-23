@@ -1,6 +1,10 @@
 import oaas
-from oaas_registry_api.rpc.registry_pb2 import OaasServiceDefinition, OaasResolveServiceResponse, OaasServiceId, \
-    OaasUnregisterServiceResponse
+from oaas_registry_api.rpc.registry_pb2 import (
+    OaasServiceDefinition,
+    OaasResolveServiceResponse,
+    OaasServiceId,
+    OaasUnregisterServiceResponse,
+)
 from oaas_registry_api.rpc.registry_pb2_grpc import OaasRegistryServicer
 
 from oaas_registry import registry_instance
@@ -8,11 +12,13 @@ from oaas_registry import registry_instance
 
 @oaas.service("oaas-registry")
 class OaasGrpcRegistry(OaasRegistryServicer):
-    def register_service(self, request: OaasServiceDefinition, context) -> OaasServiceDefinition:
+    def register_service(
+        self, request: OaasServiceDefinition, context
+    ) -> OaasServiceDefinition:
         tags = {"_protocol": "grpc"}
 
         if request.tags:
-            tags += request.tags
+            tags.update(request.tags)
 
         result = registry_instance.register_service(
             namespace=request.namespace,
@@ -30,11 +36,13 @@ class OaasGrpcRegistry(OaasRegistryServicer):
             locations=result.locations,
         )
 
-    def resolve_service(self, request: OaasServiceDefinition, context) -> OaasResolveServiceResponse:
+    def resolve_service(
+        self, request: OaasServiceDefinition, context
+    ) -> OaasResolveServiceResponse:
         tags = {"_protocol": "grpc"}
 
         if request.tags:
-            tags += request.tags
+            tags.update(request.tags)
 
         result = registry_instance.resolve_service(
             namespace=request.namespace,
@@ -51,12 +59,13 @@ class OaasGrpcRegistry(OaasRegistryServicer):
                     version=it.version,
                     tags=it.tags,
                     locations=it.locations,
-                ) for it in result
+                )
+                for it in result
             ]
         )
 
-    def unregister_service(self,
-                           request: OaasServiceId,
-                           context) -> OaasUnregisterServiceResponse:
+    def unregister_service(
+        self, request: OaasServiceId, context
+    ) -> OaasUnregisterServiceResponse:
         result = registry_instance.unregister_service(instance_id=request.id)
         return OaasUnregisterServiceResponse(result=result)

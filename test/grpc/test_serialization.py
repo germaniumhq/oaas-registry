@@ -3,6 +3,7 @@ import oaas
 
 # we import these two, to expose the oaas-registry service
 import oaas_registry.oaas_grpc_registry
+
 # FIXME: multiple types should be ok
 # import oaas_registry.oaas_simple_registry
 
@@ -18,10 +19,7 @@ oaas.client("ping-pong-service")(test_pb2_grpc.TestServiceStub)
 @oaas.service("ping-pong-service")
 class TestService(test_pb2_grpc.TestServiceServicer):
     def ping(self, request: test_pb2.Ping, context) -> test_pb2.Pong:
-        return test_pb2.Pong(
-            text=request.text + "-pong",
-            len=len(request.text)
-        )
+        return test_pb2.Pong(text=request.text + "-pong", len=len(request.text))
 
 
 class TestGrpcSerialization(unittest.TestCase):
