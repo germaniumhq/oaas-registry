@@ -15,16 +15,11 @@ class OaasGrpcRegistry(OaasRegistryServicer):
     def register_service(
         self, request: OaasServiceDefinition, context
     ) -> OaasServiceDefinition:
-        tags = {"_protocol": "grpc"}
-
-        if request.tags:
-            tags.update(request.tags)
-
         result = registry_instance.register_service(
             namespace=request.namespace,
             name=request.name,
             version=request.version,
-            tags=tags,
+            tags=request.tags,
             locations=request.locations,
         )
 
@@ -39,16 +34,11 @@ class OaasGrpcRegistry(OaasRegistryServicer):
     def resolve_service(
         self, request: OaasServiceDefinition, context
     ) -> OaasResolveServiceResponse:
-        tags = {"_protocol": "grpc"}
-
-        if request.tags:
-            tags.update(request.tags)
-
         result = registry_instance.resolve_service(
             namespace=request.namespace,
             name=request.name,
             version=request.version,
-            tags=tags,
+            tags=request.tags,
         )
 
         return OaasResolveServiceResponse(
@@ -69,3 +59,11 @@ class OaasGrpcRegistry(OaasRegistryServicer):
     ) -> OaasUnregisterServiceResponse:
         result = registry_instance.unregister_service(instance_id=request.id)
         return OaasUnregisterServiceResponse(result=result)
+
+
+def noop():
+    """
+    This function exists only for the automatic imports not to remove
+    the import to this module, that registers the OaaSRegistry service
+    """
+    return None

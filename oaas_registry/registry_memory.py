@@ -48,6 +48,7 @@ class RegistryMemory(Registry):
     def register_service(
         self,
         *,
+        protocol: str = "grpc",
         namespace: str = "default",
         name: str,
         version: str = "1",
@@ -59,6 +60,7 @@ class RegistryMemory(Registry):
         sd_tags["_instance_id"] = str(uuid.uuid4())
 
         sd = ServiceDefinition(
+            protocol=protocol,
             namespace=namespace,
             name=name,
             version=version,
@@ -66,7 +68,8 @@ class RegistryMemory(Registry):
             locations=locations,
         )
 
-        _id = f"{namespace}:{name}:{version}"
+        _id = f"{protocol}:{namespace}:{name}:{version}"
+
         self._services[_id].add(sd)
 
         for tag_key, tag_value in sd_tags.items():
@@ -78,12 +81,13 @@ class RegistryMemory(Registry):
     def resolve_service(
         self,
         *,
+        protocol: str = "grpc",
         namespace: str = "default",
         name: str,
         version: str = "1",
         tags: Dict[str, str],
     ) -> Iterable[ServiceDefinition]:
-        _id = f"{namespace}:{name}:{version}"
+        _id = f"{protocol}:{namespace}:{name}:{version}"
 
         if _id not in self._services:
             return set()
@@ -107,7 +111,7 @@ class RegistryMemory(Registry):
 
         sd = sd_set.__iter__().__next__()
 
-        _id = f"{sd.namespace}:{sd.name}:{sd.version}"
+        _id = f"{sd.protocol}:{sd.namespace}:{sd.name}:{sd.version}"
         self._services[_id].remove(sd)
 
         if not self._services[_id]:
