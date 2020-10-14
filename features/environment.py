@@ -9,7 +9,7 @@ from features.support.process_execution import ProcessExecution
 
 oaas.register_client_provider(oaas_grpc.OaasGrpcClient())
 
-oaas.client('process-name')(ProcessNameStub)
+oaas.client("process-name")(ProcessNameStub)
 
 
 def before_scenario(context: BaseContext, scenario) -> None:

@@ -4,6 +4,7 @@ Feature: OaaS clients should be able to report non-functional
   @1
   Scenario: Unregister failing service
     Given I have a process 'A' serving the service 'process-name'
+    And the 'process-name' is registered in the registry
     When I try to access the 'process-name' service
     Then I get back 'A' from oaas
     When I stop the 'A' process

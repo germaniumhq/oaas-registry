@@ -15,6 +15,7 @@ class ServiceName(testsvc_pb2_grpc.ProcessNameServicer):
     def get_process_name(self, request: testsvc_pb2.ProcessNameIn, context):
         return testsvc_pb2.ProcessNameOut(name=process_name)
 
+
 # arg1 - port
 # arg2 - service name
 # arg3 - process name

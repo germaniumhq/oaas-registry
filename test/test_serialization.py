@@ -85,8 +85,11 @@ class TestSerialization(unittest.TestCase):
             str_e = str(e)
 
             # the error message should be available
-            self.assertIn("ping call failed", str_e,
-                          msg="The call should contain the error message")
+            self.assertIn(
+                "ping call failed",
+                str_e,
+                msg="The call should contain the error message",
+            )
 
         self.assertTrue(error_thrown, "An error should have been thrown")
 

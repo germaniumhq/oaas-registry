@@ -4,6 +4,8 @@ from typing import Type
 
 import oaas
 from behave import step, use_step_matcher
+from oaas_grpc.client.oaas_registry import oaas_registry
+from oaas_registry_api.rpc.registry_pb2 import OaasServiceDefinition
 
 from features.steps.testsvc.testsvc_pb2 import ProcessNameIn, ProcessNameOut
 from features.steps.testsvc.testsvc_pb2_grpc import ProcessNameStub
@@ -19,14 +21,16 @@ port: int = 9000
 @step("I add a process named '(.*?)' for the '(.*?)' service")
 @step("I add back '(.*?)' for the '(.*?)' service")
 @step("I have a process '(.*?)' serving the service '(.*?)'")
-def step_impl(context: BaseContext, process_name: str, service_name: str) -> None:
+def create_process_service(
+    context: BaseContext, process_name: str, service_name: str
+) -> None:
     global port
 
     process = ProcessExecution(
         command=[
             "python",
             "-m",
-            "features.steps.testsvc.testsvc_main",
+            "features.steps.testsvc.tstsvc_main",
             str(port),
             service_name,
             process_name,
@@ -57,7 +61,7 @@ def get_client(context: BaseContext, t: Type[ProcessNameStub]) -> ProcessNameStu
 
 
 @step("I try to access the 'process-name' service")
-def step_impl(context: BaseContext):
+def call_process_name_service(context: BaseContext):
     client = get_client(context, ProcessNameStub)
     try:
         out: ProcessNameOut = client.get_process_name(ProcessNameIn())
@@ -69,24 +73,47 @@ def step_impl(context: BaseContext):
 
 
 @step("I stop the '(.*?)' process")
-def step_impl(context: BaseContext, process_name):
+def stop_process(context: BaseContext, process_name):
     context.processes[process_name].kill()
 
 
 @step("I get back '(.*?)' from oaas")
 @step("I still get back '(.*?)' from oaas since I have a persistent connection")
 @step("I get back '(.*?)' from oaas since 'A' is dead")
-def step_impl(context: BaseContext, expected):
+def check_result_process(context: BaseContext, expected):
     if context.call_error:
-        raise Exception(f"Expected {expected} but the service got an error: {context.call_error}")
+        raise Exception(
+            f"Expected {expected} but the service got an error: {context.call_error}"
+        )
     test.assertEqual(expected, context.call_result)
 
 
 @step("I get an exception since there is no process serving 'process-name'")
-def step_impl(context: BaseContext) -> None:
+def expect_exception(context: BaseContext) -> None:
     test.assertIsNotNone(context.call_error)
 
 
 @step("the '(.+?)' is not registered anymore in the registry")
-def step_impl(context: BaseContext, process_name: str) -> None:
-    raise NotImplementedError(u'STEP: And the \'process-name\' is not registered anymore in the registry')
+def check_not_in_registry(context: BaseContext, service_name: str) -> None:
+    result = oaas_registry().resolve_service(
+        OaasServiceDefinition(
+            namespace="default",
+            name=service_name,
+            version="1",
+        )
+    )
+
+    test.assertFalse(result.services)
+
+
+@step("the '(.+?)' is registered in the registry")
+def check_in_registry(context: BaseContext, service_name: str) -> None:
+    result = oaas_registry().resolve_service(
+        OaasServiceDefinition(
+            namespace="default",
+            name=service_name,
+            version="1",
+        )
+    )
+
+    test.assertTrue(result.services)

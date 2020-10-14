@@ -7,10 +7,8 @@ from typing import List
 class ProcessExecution:
     def __init__(self, *, command: List[str]) -> None:
         self._process = subprocess.Popen(
-                   command,
-                   cwd=os.curdir,
-                   stdout=subprocess.PIPE,
-                   stderr=subprocess.PIPE)
+            command, cwd=os.curdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
     @property
     def stderr(self) -> str:
@@ -18,6 +16,8 @@ class ProcessExecution:
         Reads the current content added to stderr in a nonblocking
         fashion
         """
+        assert self._process.stderr
+
         fd = self._process.stderr
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
@@ -34,6 +34,8 @@ class ProcessExecution:
         Reads the current content added to stdout in a nonblocking
         fashion.
         """
+        assert self._process.stdout
+
         fd = self._process.stdout
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)

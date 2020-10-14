@@ -8,6 +8,6 @@ class BaseContext:
     processes: Dict[str, ProcessExecution]
     clients: Dict[str, ProcessNameStub]
 
-    client: ProcessNameStub
+    client: Optional[ProcessNameStub]
     call_result: Optional[str]
     call_error: Optional[Exception]
