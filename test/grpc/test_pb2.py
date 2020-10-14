@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     syntax="proto3",
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_pb=b'\n\ntest.proto"\x14\n\x04Ping\x12\x0c\n\x04text\x18\x01 \x01(\t"!\n\x04Pong\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x0b\n\x03len\x18\x02 \x01(\x05\x32%\n\x0bTestService\x12\x16\n\x04ping\x12\x05.Ping\x1a\x05.Pong"\x00\x62\x06proto3',
+    serialized_pb=b'\n\ntest.proto"\x14\n\x04Ping\x12\x0c\n\x04text\x18\x01 \x01(\t"!\n\x04Pong\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x0b\n\x03len\x18\x02 \x01(\x05\x32\x64\n\x0bTestService\x12\x16\n\x04ping\x12\x05.Ping\x1a\x05.Pong"\x00\x12\x1b\n\tping_copy\x12\x05.Ping\x1a\x05.Pong"\x00\x12 \n\x0eping_exception\x12\x05.Ping\x1a\x05.Pong"\x00\x62\x06proto3',
 )
 
 
@@ -157,12 +157,32 @@ _TESTSERVICE = _descriptor.ServiceDescriptor(
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
     serialized_start=71,
-    serialized_end=108,
+    serialized_end=171,
     methods=[
         _descriptor.MethodDescriptor(
             name="ping",
             full_name="TestService.ping",
             index=0,
+            containing_service=None,
+            input_type=_PING,
+            output_type=_PONG,
+            serialized_options=None,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.MethodDescriptor(
+            name="ping_copy",
+            full_name="TestService.ping_copy",
+            index=1,
+            containing_service=None,
+            input_type=_PING,
+            output_type=_PONG,
+            serialized_options=None,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.MethodDescriptor(
+            name="ping_exception",
+            full_name="TestService.ping_exception",
+            index=2,
             containing_service=None,
             input_type=_PING,
             output_type=_PONG,

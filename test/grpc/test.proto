@@ -12,4 +12,6 @@ message Pong {
 
 service TestService {
   rpc ping(Ping) returns (Pong) {}
+  rpc ping_copy(Ping) returns (Pong) {}
+  rpc ping_exception(Ping) returns (Pong) {}
 }

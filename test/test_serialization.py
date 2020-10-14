@@ -33,8 +33,18 @@ class TestService(test_pb2_grpc.TestServiceServicer):
     def ping(self, request: test_pb2.Ping, context) -> test_pb2.Pong:
         return test_pb2.Pong(text=request.text + "-pong", len=len(request.text))
 
+    def ping_copy(self, request: test_pb2.Ping, context) -> test_pb2.Pong:
+        return test_pb2.Pong(text=request.text + "-pong", len=len(request.text))
 
-class TestGrpcSerialization(unittest.TestCase):
+    def ping_exception(self, request: test_pb2.Ping, context) -> test_pb2.Pong:
+        raise Exception("ping call failed")
+
+
+class TestSerialization(unittest.TestCase):
+    """
+    We test the serialization of the OaaS providers.
+    """
+
     @staticmethod
     def setUpClass() -> None:
         oaas.register_server_provider(OaasGrpcServer())
@@ -51,9 +61,34 @@ class TestGrpcSerialization(unittest.TestCase):
     def test_grpc_serialization(self) -> None:
         client = oaas.get_client(test_pb2_grpc.TestServiceStub)
         result = client.ping(test_pb2.Ping(text="ping"))
-
         self.assertEqual("ping-pong", result.text)
         self.assertEqual(4, result.len)
+
+        client = oaas.get_client(test_pb2_grpc.TestServiceStub)
+        result = client.ping_copy(test_pb2.Ping(text="ping"))
+        self.assertEqual("ping-pong", result.text)
+        self.assertEqual(4, result.len)
+
+        client = oaas.get_client(test_pb2_grpc.TestServiceStub)
+        result = client.ping(test_pb2.Ping(text="ping"))
+        self.assertEqual("ping-pong", result.text)
+        self.assertEqual(4, result.len)
+
+    def test_grpc_service_error(self) -> None:
+        error_thrown = False
+
+        try:
+            client = oaas.get_client(test_pb2_grpc.TestServiceStub)
+            client.ping_exception(test_pb2.Ping(text="ping"))
+        except Exception as e:
+            error_thrown = True
+            str_e = str(e)
+
+            # the error message should be available
+            self.assertIn("ping call failed", str_e,
+                          msg="The call should contain the error message")
+
+        self.assertTrue(error_thrown, "An error should have been thrown")
 
     def test_simple_serialization(self) -> None:
         client = oaas.get_client(TestSimpleServiceClient)
