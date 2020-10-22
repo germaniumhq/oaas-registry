@@ -3,10 +3,9 @@ import functools
 import uuid
 from typing import Dict, Iterable, Set, Callable, TypeVar
 
-from readerwriterlock import rwlock
-
 from oaas_registry.registry import Registry
 from oaas_registry.service_definition import ServiceDefinition
+from readerwriterlock import rwlock
 
 T = TypeVar("T")
 
@@ -40,9 +39,9 @@ def read_lock(f: Callable[..., T]) -> Callable[..., T]:
 class RegistryMemory(Registry):
     def __init__(self) -> None:
         self._services: Dict[str, Set[ServiceDefinition]] = collections.defaultdict(set)
-        self._rwlock = rwlock.RWLockWrite()
+        self._rwlock = rwlock.RWLockFair()
         self._wlock = self._rwlock.gen_wlock()
-        self._rlock = self._rwlock.gen_wlock()
+        self._rlock = self._rwlock.gen_rlock()
 
     @write_lock
     def register_service(
