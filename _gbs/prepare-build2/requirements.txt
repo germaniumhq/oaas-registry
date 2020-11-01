@@ -4,3 +4,4 @@ readerwriterlock==1.0.7
 oaas_grpc
 oaas_simple
 oaas_registry_api
+countertype

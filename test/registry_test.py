@@ -47,7 +47,7 @@ class RegistryTest(unittest.TestCase):
         self.assertTrue(sd1 not in services)
         self.assertTrue(sd2 in services)
 
-        registry.unregister_service(instance_id=sd2.instance_id)
+        registry.unregister_service(id=sd2.id)
 
         services = registry.resolve_service(
             name="abc", version="1", tags={"_protocol": "grpc"}
@@ -63,7 +63,7 @@ class RegistryTest(unittest.TestCase):
             msg="sd2 was removed, so it shouldn't be findable " "anymore",
         )
 
-        registry.unregister_service(instance_id=sd1.instance_id)
+        registry.unregister_service(id=sd1.id)
 
         services = registry.resolve_service(
             name="abc", version="1", tags={"_protocol": "grpc"}
