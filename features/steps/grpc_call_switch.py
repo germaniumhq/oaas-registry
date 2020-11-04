@@ -1,16 +1,17 @@
+import signal
 import time
 import unittest
 from typing import Type
 
 import oaas
 from behave import step, use_step_matcher
-from oaas_grpc.client.oaas_registry import oaas_registry
-from oaas_registry_api.rpc.registry_pb2 import OaasServiceDefinition
-
+from features.steps.testsvc.stdreader import read_stdout, read_stderr
 from features.steps.testsvc.testsvc_pb2 import ProcessNameIn, ProcessNameOut
 from features.steps.testsvc.testsvc_pb2_grpc import ProcessNameStub
 from features.support.model import BaseContext
 from features.support.process_execution import ProcessExecution
+from oaas_grpc.client.oaas_registry import oaas_registry
+from oaas_registry_api.rpc.registry_pb2 import OaasServiceDefinition
 
 test = unittest.TestCase()
 use_step_matcher("re")
@@ -51,11 +52,49 @@ def create_process_service(
     port += 1
 
 
-def get_client(context: BaseContext, t: Type[ProcessNameStub]) -> ProcessNameStub:
+@step(
+    "I have a process '(.+?)' dynamically serving the service '(.+?)' with a custom '(.+?)' tag"
+)
+def create_process_service_tags(
+    context: BaseContext,
+    process_name: str,
+    service_name: str,
+    tag_value: str,
+) -> None:
+    global port
+
+    process = ProcessExecution(
+        command=[
+            "python",
+            "-m",
+            "features.steps.testsvc.tstsvc_dynamic_main",
+            str(port),
+            service_name,
+            process_name,
+            tag_value,
+        ]
+    )
+
+    context.processes[process_name] = process
+
+    while True:
+        stdout_content = read_stdout(process)
+        if f"test server running on {port}" in stdout_content:
+            break
+        read_stderr(process)
+
+        time.sleep(0.1)
+
+    port += 1
+
+
+def get_client(
+    context: BaseContext, t: Type[ProcessNameStub], **tags
+) -> ProcessNameStub:
     if context.client:
         return context.client
 
-    context.client = oaas.get_client(t)
+    context.client = oaas.get_client(t, **tags)
 
     return context.client
 
@@ -63,6 +102,7 @@ def get_client(context: BaseContext, t: Type[ProcessNameStub]) -> ProcessNameStu
 @step("I try to access the 'process-name' service")
 def call_process_name_service(context: BaseContext):
     client = get_client(context, ProcessNameStub)
+
     try:
         out: ProcessNameOut = client.get_process_name(ProcessNameIn())
         context.call_result = out.name
@@ -70,6 +110,28 @@ def call_process_name_service(context: BaseContext):
     except Exception as e:
         context.call_result = None
         context.call_error = e
+
+
+@step("I try to access the 'process-name' service with a custom '(.+?)' tag")
+def call_process_name_service_tags(context: BaseContext, tag_value: str):
+    try:
+        client = oaas.get_client(ProcessNameStub, sometag=tag_value)
+
+        out: ProcessNameOut = client.get_process_name(ProcessNameIn())
+        context.call_result = out.name
+        context.call_error = None
+    except Exception as e:
+        context.call_result = None
+        context.call_error = e
+
+
+@step("I unregister the 'process-name' from the '(.+?)' process")
+def unregister_tag_from_process_by_calling_USR2_signal(context, process_name):
+    process = context.processes[process_name]
+    process.signal(signal.SIGUSR2)
+
+    while "service unregistered" not in process.stdout:
+        time.sleep(0.1)
 
 
 @step("I stop the '(.*?)' process")

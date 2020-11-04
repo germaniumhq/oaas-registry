@@ -46,6 +46,9 @@ class ProcessExecution:
 
         return data.decode("utf-8")
 
+    def signal(self, sig) -> None:
+        self._process.send_signal(sig)
+
     def kill(self) -> None:
         """
         Kills the current process

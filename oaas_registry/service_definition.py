@@ -22,4 +22,4 @@ class ServiceDefinition:
         self.locations = locations
 
     def __repr__(self) -> str:
-        return f"svc:{self.protocol}:{self.namespace}:{self.name}:{self.version}"
+        return f"svc:{self.protocol}:{self.namespace}:{self.name}:{self.version} tags: {self.tags}"

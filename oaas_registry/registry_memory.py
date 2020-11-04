@@ -112,3 +112,9 @@ class RegistryMemory(Registry):
             return True
 
         return False
+
+    @read_lock
+    def _print_registered_services(self) -> None:
+        print("Services:")
+        for service in self._services.find_all():
+            print(service)

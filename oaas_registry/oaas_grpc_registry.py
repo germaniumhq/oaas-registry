@@ -24,6 +24,7 @@ class OaasGrpcRegistry(OaasRegistryServicer):
         )
 
         return OaasServiceDefinition(
+            id=result.id,
             namespace=result.namespace,
             name=result.name,
             version=result.version,
@@ -35,6 +36,7 @@ class OaasGrpcRegistry(OaasRegistryServicer):
         self, request: OaasServiceDefinition, context
     ) -> OaasResolveServiceResponse:
         result = registry_instance.resolve_service(
+            id=request.id,
             namespace=request.namespace,
             name=request.name,
             version=request.version,
@@ -44,6 +46,7 @@ class OaasGrpcRegistry(OaasRegistryServicer):
         return OaasResolveServiceResponse(
             services=[
                 OaasServiceDefinition(
+                    id=it.id,
                     namespace=it.namespace,
                     name=it.name,
                     version=it.version,
