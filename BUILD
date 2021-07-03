@@ -3,4 +3,12 @@ python_binary(
   srcs=glob(["oaas_registry/**/*.py"],
             exclude=["oaas_registry/__main__.py"]),
   main="oaas_registry/__main__.py",
+  deps=[
+    "//oaas/countertype",
+    "//oaas/registry-api",
+    "//oaas/grpc",
+    "//oaas/oaas",
+    "//thirdparty/python:grpc-stubs",
+    "//thirdparty/python:readerwriterlock",
+  ]
 )
