@@ -5,8 +5,8 @@ ge_python_library(
   name="registry",
   deps=[
     # external
-    "//build/thirdparty/python:grpc-stubs",
-    "//build/thirdparty/python:readerwriterlock",
+    "//build/thirdparty/gepython:grpc-stubs",
+    "//build/thirdparty/gepython:readerwriterlock",
 
     # local
     "//oaas/oaas",
