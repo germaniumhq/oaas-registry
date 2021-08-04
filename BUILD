@@ -1,12 +1,35 @@
 subinclude("//build/please:python.plz")
 
-
-ge_python_library(
+python_binary(
   name="registry",
+  deps=[
+    # external
+    "//build/thirdparty/python:grpc-stubs",
+    "//build/thirdparty/python:readerwriterlock",
+    "//build/thirdparty/python:typing-extensions",
+
+    # local
+    "//oaas/oaas:oaas-lib",
+    "//oaas/grpc:grpc-lib",
+    "//oaas/simple:simple-lib",
+    "//oaas/registry-api:registry-api-lib",
+    "//oaas/countertype:countertype-lib",
+  ],
+  srcs=glob([
+    "oaas_registry/**/*.py"
+  ], exclude=[
+    "oaas_registry/__main__.py",
+  ]),
+  main="oaas_registry/__main__.py",
+)
+
+ge_python_image(
+  name="registry-image",
   deps=[
     # external
     "//build/thirdparty/gepython:grpc-stubs",
     "//build/thirdparty/gepython:readerwriterlock",
+    "//build/thirdparty/gepython:typing-extensions",
 
     # local
     "//oaas/oaas",
@@ -16,14 +39,6 @@ ge_python_library(
     "//oaas/countertype",
   ],
   srcs=glob(["oaas_registry/**/*.py"]),
-)
-
-
-ge_python_image(
-  name="registry-image",
-  deps=[
-    ":registry",
-  ],
   main="oaas_registry/__main__.py",
 )
 
